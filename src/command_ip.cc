@@ -157,6 +157,7 @@ apply_ip_tables_add_address(const torrent::Object::list_type& args) {
 ///////////////////////////////////////////////////////////
 bool
 ipv4_range_parse(const char* address, uint32_t* address_start, uint32_t* address_end) {
+  char address_copy[4096]; // same length as buffer used to do reads so no worries about overflow
   bool valid = false;
   char address_start_str[20];
   int  address_start_index=0;
@@ -164,9 +165,20 @@ ipv4_range_parse(const char* address, uint32_t* address_start, uint32_t* address
   *address_start=0;
   *address_end=0;
 
+  // get rid of everything after '#' comments
+  // copy everything up to '#'  to address_copy and work from there 
+  while(address[address_start_index] != '#' && address[address_start_index] != '\r' && 
+    address[address_start_index] != '\n' && address[address_start_index] != '\0' && 
+    address_start_index < 4096 ) {
+    address_copy[address_start_index] = address[address_start_index];
+    address_start_index++;
+  }
+  address_copy[address_start_index] = '\0';
+  address_start_index=0;
+
   // skip everything up to and including last ':' character and whitespace 
-  const char* addr = strrchr(address, ':');
-  addr = addr == NULL ? address : addr+1;
+  const char* addr = strrchr(address_copy, ':');
+  addr = addr == NULL ? address_copy : addr+1;
   while(addr[0] == ' ' || addr[0] == '\t')
     addr++;
 

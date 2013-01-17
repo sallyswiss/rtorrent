@@ -139,22 +139,22 @@ apply_ip_tables_add_address(const torrent::Object::list_type& args) {
 //
 
 
-/**********************************************************
- * IPV4_RANGE_PARSE parses string into an ip range
- *
- * should be compatible with lines in p2p files
- * everything in address before colon is ignored
- *
- * ip range can be single ip in which case start=end
- * ip range can be cidr notation a.b.c.d/e
- * ip range can be explicit range like in p2p line a.b.c.d-w.x.y.z 
- *
- * returns false if line does not contain valid ip or ip range
- * address_start and address_end will contain start and end ip
- *
- * addresses parsed are returned in host byte order
- * to get network byte order call htonl(address)
- *********************************************************/
+///////////////////////////////////////////////////////////
+// IPV4_RANGE_PARSE parses string into an ip range
+//
+// should be compatible with lines in p2p files
+// everything in address before colon is ignored
+//
+// ip range can be single ip in which case start=end
+// ip range can be cidr notation a.b.c.d/e
+// ip range can be explicit range like in p2p line a.b.c.d-w.x.y.z 
+//
+// returns false if line does not contain valid ip or ip range
+// address_start and address_end will contain start and end ip
+//
+// addresses parsed are returned in host byte order
+// to get network byte order call htonl(address)
+///////////////////////////////////////////////////////////
 bool
 ipv4_range_parse(const char* address, uint32_t* address_start, uint32_t* address_end) {
   bool valid = false;
@@ -164,7 +164,7 @@ ipv4_range_parse(const char* address, uint32_t* address_start, uint32_t* address
   *address_start=0;
   *address_end=0;
 
-  /* skip everything up to and including last ':' character and whitespace */
+  // skip everything up to and including last ':' character and whitespace 
   const char* addr = strrchr(address, ':');
   addr = addr == NULL ? address : addr+1;
   while(addr[0] == ' ' || addr[0] == '\t')
@@ -178,7 +178,7 @@ ipv4_range_parse(const char* address, uint32_t* address_start, uint32_t* address
   address_start_str[address_start_index] = '\0';
 
   if(strchr(addr, '-') != NULL) { 
-    /*explicit range*/
+    // explicit range
     char address_end_str[20];
     int address_end_index=0;
     struct sockaddr_in sa_end;
@@ -201,7 +201,7 @@ ipv4_range_parse(const char* address, uint32_t* address_start, uint32_t* address
     }
   }
   else if(strchr(addr, '/') != NULL) {
-    /*cidr range*/
+    // cidr range
     char mask_bits_str[20];
     int mask_bits_index=0;
     uint32_t mask_bits;
@@ -229,7 +229,7 @@ ipv4_range_parse(const char* address, uint32_t* address_start, uint32_t* address
     }
   }
   else {
-    /*single ip*/
+    // single ip
     if(inet_pton(AF_INET, address_start_str, &(sa_start.sin_addr)) != 0) {
       *address_start = ntohl(sa_start.sin_addr.s_addr);
       *address_end = *address_start;
@@ -243,14 +243,14 @@ ipv4_range_parse(const char* address, uint32_t* address_start, uint32_t* address
 
 
 
-/**********************************************************
- * IPV4_FILTER_PARSE
- *
- * should now be compatible with lines in p2p files
- *
- * addresses in table MUST be in host byte order
- * ntohl is called after parsing ip address(es)
- *********************************************************/
+///////////////////////////////////////////////////////////
+// IPV4_FILTER_PARSE
+//
+// should now be compatible with lines in p2p files
+//
+// addresses in table MUST be in host byte order
+// ntohl is called after parsing ip address(es)
+///////////////////////////////////////////////////////////
 void
 ipv4_filter_parse(const char* address, int value) {
   uint32_t address_start;
@@ -269,18 +269,18 @@ ipv4_filter_parse(const char* address, int value) {
 }
 
 
-/***********************************************
- * APPLY_IPV4_FILTER_SIZE_DATA
- **********************************************/
+////////////////////////////////////////////////
+// APPLY_IPV4_FILTER_SIZE_DATA
+////////////////////////////////////////////////
 torrent::Object
 apply_ipv4_filter_size_data() {
   return torrent::PeerList::ipv4_filter()->sizeof_data();
 }
 
 
-/***********************************************
- * APPLY_IPV4_FILTER_GET
- **********************************************/
+////////////////////////////////////////////////
+// APPLY_IPV4_FILTER_GET
+////////////////////////////////////////////////
 torrent::Object
 apply_ipv4_filter_get(const std::string& args) {
   uint32_t address_start;
@@ -293,9 +293,9 @@ apply_ipv4_filter_get(const std::string& args) {
 }
 
 
-/***********************************************
- * APPLY_IPV4_FILTER_ADD_ADDRESS
- **********************************************/
+////////////////////////////////////////////////
+// APPLY_IPV4_FILTER_ADD_ADDRESS
+////////////////////////////////////////////////
 torrent::Object
 apply_ipv4_filter_add_address(const torrent::Object::list_type& args) {
   if (args.size() != 2)
@@ -306,9 +306,9 @@ apply_ipv4_filter_add_address(const torrent::Object::list_type& args) {
   return torrent::Object();
 }
 
-/***********************************************
- * APPLY_IPV4_FILTER_LOAD
- **********************************************/
+////////////////////////////////////////////////
+// APPLY_IPV4_FILTER_LOAD
+////////////////////////////////////////////////
 torrent::Object
 apply_ipv4_filter_load(const torrent::Object::list_type& args) {
   if (args.size() != 2)
@@ -355,9 +355,9 @@ apply_ipv4_filter_load(const torrent::Object::list_type& args) {
 }
 
 
-/***********************************************
- * APPLY_IPV4_FILTER_DUMP
- **********************************************/
+////////////////////////////////////////////////
+// APPLY_IPV4_FILTER_DUMP
+////////////////////////////////////////////////
 torrent::Object
 apply_ipv4_filter_dump() {
   torrent::Object raw_result = torrent::Object::create_list();
